@@ -25,6 +25,7 @@ def main():
     st.title("Automating LLMs for Content Analysis")
     st.write("Welcome to the content analysis automation app!")
     st.file_uploader("Submit codebook here:", ['pdf', 'docx']) # adds widget to upload the codebook
+        st.file_uploader("Submit data here:", ['xlsx']) #widget for uploading data
 
 if __name__ == "__main__":
     main()
