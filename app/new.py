@@ -89,14 +89,15 @@ text_entries = [
     "I started chemotherapy on February 10, 2020…After that I will have 25 days of radiation. Reconstruction will begin six months after that. So, 2020 has not been the year I hoped it would be. My ordeal combined with the COVID-19 pandemic has been surreal. But through it all, I have had great support from my family and friends.",
     "My name is Nikia. I was diagnosed with breast cancer at 16 years old in 1994 at a time when breast cancer treatment options were limited. Not only that – I was fighting for my life at a time when all of my friends’ biggest concerns were which dress they’d wear to prom. As you can imagine, breast cancer rocked my world.",
     "Four kids and metastatic breast cancer. Tabatha Ann’s powerful story explains the realities of living with metastatic breast cancer while being a mom. It’s not easy but she refuses to ever give up.",
-    "This is a picture of my best friend for the last 46 years, who has put his life on hold for a year to support me and stay by my side every day. That is what love is all about.” – Kathy, breast cancer survivor. Yesterday marked Kathy’s last day of treatment – join us in celebrating this incredible milestone with her!",
-    "I was diagnosed with Stage 2A Invasive Ductal Carcinoma, at the age of 32, and since this day my life has completely changed",
-    "Rest in peace to Jill Cohen, a powerful breast cancer advocate and friend, who passed away after 17 years of fighting breast cancer. Our hearts are with her family and friends.",
-    "I had a bilateral mastectomy and had decided I did not want a reconstruction. It took a lot of work to feel at peace with my decision. My breasts had fed both of my children and served me well, but now it was time to let them go. I feel proud to still be here and to have highlighted that beauty comes in different shapes and sizes. It is what is inside us that shines out. Today, I am enough. Boobless and all.'",
-    # Add more text entries as needed
+    # "This is a picture of my best friend for the last 46 years, who has put his life on hold for a year to support me and stay by my side every day. That is what love is all about.” – Kathy, breast cancer survivor. Yesterday marked Kathy’s last day of treatment – join us in celebrating this incredible milestone with her!",
+    # "I was diagnosed with Stage 2A Invasive Ductal Carcinoma, at the age of 32, and since this day my life has completely changed",
+    # "Rest in peace to Jill Cohen, a powerful breast cancer advocate and friend, who passed away after 17 years of fighting breast cancer. Our hearts are with her family and friends.",
+    # "I had a bilateral mastectomy and had decided I did not want a reconstruction. It took a lot of work to feel at peace with my decision. My breasts had fed both of my children and served me well, but now it was time to let them go. I feel proud to still be here and to have highlighted that beauty comes in different shapes and sizes. It is what is inside us that shines out. Today, I am enough. Boobless and all.'",
+    # # Add more text entries as needed
 ]
 
 # Function to ask OpenAI to annotate text based on persona
+@st.cache_data
 def get_annotation_from_api(entry, persona):
     prompt = f"Based on your persona as {persona}, please annotate the following text with the relevant categories from the codebook. The codebook includes: \n" + \
              "Narrative Event(s) related to breast cancer: Prevention, Detection, diagnosis, Treatment, Survivorship \n" + \
@@ -116,8 +117,70 @@ def get_annotation_from_api(entry, persona):
     
     return response.choices[0].message.content.strip()
 
+
+
 # Initialize dictionary for annotations
 annotations = {entry: {"Emily": "", "Michael": ""} for entry in text_entries}
+
+# Function to get chat discussion and extract updated codebook rules
+def get_chatbot_discussion_and_update_codebook(text_entries, annotations, codebook):
+    prompt = f"Emily and Michael have independently annotated the following text entries with their annotations: \n\n"
+    for i, entry in enumerate(text_entries):
+        prompt += f"Text {i+1}: {entry}\n\n"
+        prompt += f"Emily's Annotation: {annotations[entry]['Emily']}\n"
+        prompt += f"Michael's Annotation: {annotations[entry]['Michael']}\n\n"
+
+    prompt += (
+        "Based on the differences in their annotations, they will discuss how to refine the codebook rules "
+        "to make them clearer and more specific. Provide a transcript of their discussion and propose updated rules for the codebook."
+        "\n\nReturn only the updated rules as JSON."
+    )
+
+    response = openai.chat.completions.create(
+        model="gpt-4o-mini", 
+        messages=[
+            {"role": "system", "content": "You are facilitating a discussion between two personas (Emily and Michael) to refine codebook annotations."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.7,
+        max_tokens=800
+    )
+    
+    discussion_and_updates = response.choices[0].message.content.strip()
+    
+    # Display the discussion
+    st.write("Discussion Transcript:")
+    st.write(discussion_and_updates)
+    
+    # Extract JSON for updated codebook
+    import json
+    try:
+        json_start_index = discussion_and_updates.find("{")
+        json_data = discussion_and_updates[json_start_index:]
+        updated_rules = json.loads(json_data)
+        
+        # Update the codebook with new rules
+        for category, updates in updated_rules.items():
+            if category in codebook:
+                codebook[category].update(updates)
+            else:
+                codebook[category] = updates
+        
+        st.success("Codebook updated successfully!")
+        return codebook
+    except json.JSONDecodeError:
+        st.error("Failed to parse updated rules. Please check the discussion output for manual updates.")
+        
+        return codebook
+
+# Get chatbot discussion and updated codebook
+st.header("Phase 4: Discussion and Codebook Refinement")
+codebook = get_chatbot_discussion_and_update_codebook(text_entries, annotations, codebook)
+
+# Display the updated codebook
+st.subheader("Updated Codebook")
+st.json(codebook)
+
 
 # Annotation process for each text entry
 for entry in text_entries:
@@ -131,6 +194,11 @@ for entry in text_entries:
     annotations[entry]["Michael"] = get_annotation_from_api(entry, "Michael")
     st.write(f"Michael's Annotation: {annotations[entry]['Michael']}")
 
+    
 # Display collected annotations
 st.header("Annotations Summary")
 st.write(annotations)
+
+discussion = get_chatbot_discussion_and_update_codebook(text_entries, annotations, codebook)
+
+
