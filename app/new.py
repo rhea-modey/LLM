@@ -16,6 +16,14 @@ chatbot_personas = {
     "Michael": "You are a 38-year-old Hispanic male social scientist with a Ph.D. in Sociology and 15 years of experience in analyzing social dynamics and health narratives. You are known for your intuitive and empathetic approach to research, focusing on the emotional tone and social context. As you analyze the data, consider the broader implications and the underlying human experiences. Your goal is to capture the nuances and emotional depth of the data, reflecting your understanding of the social dynamics and your commitment to empathy and insight."
 }
 
+#input dataset
+#make sure you've installed openpyxl: pip install streamlit pandas openpyxl
+st.header("Data Upload")
+uploaded_data = st.file_uploader("Upload the Data set (Excel Sheet)", type=["xlsx"])
+data_sheet = pd.read_excel(uploaded_data)
+#The text data is in the column called "content" 
+#and the correct values are in columns called "NE" and "NP" for narrative events and narrative perspective
+
 # Phase 1: Chatbot persona creation
 st.header("Phase 1: Chatbot Persona Creation")
 persona_selected = st.radio("Select Chatbot Persona", list(chatbot_personas.keys()))
