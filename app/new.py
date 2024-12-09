@@ -3,6 +3,8 @@ import streamlit as st
 from openai import OpenAI
 import os
 from docx import Document
+import pandas as pd
+import matplotlib.pyplot as plt
 
 # Set OpenAI API key
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -23,6 +25,16 @@ uploaded_data = st.file_uploader("Upload the Data set (Excel Sheet)", type=["xls
 data_sheet = pd.read_excel(uploaded_data)
 #The text data is in the column called "content" 
 #and the correct values are in columns called "NE" and "NP" for narrative events and narrative perspective
+
+#this is code for plotting the values
+narrative_events = data_sheet["NE"].to_numpy()
+
+fig, ax = plt.subplots()
+ax.plot(narrative_events, linestyle = "-", marker='o', label = "true answer")  # Plot the first 20 entries for illustration
+ax.set_title(f'Narrative Events')
+ax.set_xlabel('Index')
+ax.set_ylabel("value")
+ax.legend()
 
 # Phase 1: Chatbot persona creation
 st.header("Phase 1: Chatbot Persona Creation")
@@ -92,11 +104,15 @@ flattened_codebook = {
     ]
 }
 
+text_entries = data_sheet.loc[:2, "content"].to_numpy()
+#change this number to increas the number of text entries used
+st.write(text_entries)
+
 # Sample text entries
-text_entries = [
-    "I started chemotherapy on February 10, 2020…After that I will have 25 days of radiation. Reconstruction will begin six months after that. So, 2020 has not been the year I hoped it would be. My ordeal combined with the COVID-19 pandemic has been surreal. But through it all, I have had great support from my family and friends.",
-    "My name is Nikia. I was diagnosed with breast cancer at 16 years old in 1994 at a time when breast cancer treatment options were limited. Not only that – I was fighting for my life at a time when all of my friends’ biggest concerns were which dress they’d wear to prom. As you can imagine, breast cancer rocked my world.",
-    "Four kids and metastatic breast cancer. Tabatha Ann’s powerful story explains the realities of living with metastatic breast cancer while being a mom. It’s not easy but she refuses to ever give up.",
+#text_entries = [
+    #"I started chemotherapy on February 10, 2020…After that I will have 25 days of radiation. Reconstruction will begin six months after that. So, 2020 has not been the year I hoped it would be. My ordeal combined with the COVID-19 pandemic has been surreal. But through it all, I have had great support from my family and friends.",
+    #"My name is Nikia. I was diagnosed with breast cancer at 16 years old in 1994 at a time when breast cancer treatment options were limited. Not only that – I was fighting for my life at a time when all of my friends’ biggest concerns were which dress they’d wear to prom. As you can imagine, breast cancer rocked my world.",
+    #"Four kids and metastatic breast cancer. Tabatha Ann’s powerful story explains the realities of living with metastatic breast cancer while being a mom. It’s not easy but she refuses to ever give up.",
     # "This is a picture of my best friend for the last 46 years, who has put his life on hold for a year to support me and stay by my side every day. That is what love is all about.” – Kathy, breast cancer survivor. Yesterday marked Kathy’s last day of treatment – join us in celebrating this incredible milestone with her!",
     # "I was diagnosed with Stage 2A Invasive Ductal Carcinoma, at the age of 32, and since this day my life has completely changed",
     # "Rest in peace to Jill Cohen, a powerful breast cancer advocate and friend, who passed away after 17 years of fighting breast cancer. Our hearts are with her family and friends.",
