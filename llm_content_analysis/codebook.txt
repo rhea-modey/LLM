@@ -1,0 +1,22 @@
+Codebook for Coders
+The text was posted by breast cancer nonprofit organizations on Facebook and contained narratives/stories related to breast cancer. 
+
+•	Narrative Event(s) related to breast cancer “NE” [choose all that apply]
+Definition: A narrative event involves specific events or actions experienced by a character or narrator in the post. Please code the occurrences of all events in the post, such as “3”, “2,4”, or “2,4,5”. 
+1.	Prevention
+2.	Detection, diagnosis
+3.	Treatment 
+•	Receiving treatment (e.g., getting the IV chemo, lying in the hospital bed)
+•	Treatment effects (e.g., bald head, flat chest, wearing a head wrap)
+•	Treatment milestone or completion (e.g., ringing the chemo bell, showing radiation therapy completion certificate).
+4.	Survivorship
+•	Complete remission/cancer free; recurrence; a second cancer; and death.
+•	Fundraising, any prosocial or philanthropic activities.
+
+•	Narrator perspective  “NP” [choose one]
+Definition: Narrator is the person telling the story. When coding, prioritize a perspective that is NOT the breast cancer organization. 
+1. Breast cancer survivor 
+2. Breast cancer survivor’s family or friends 
+3. Mixed (i.e., survivor + family or friends)
+4. Journalists/news media 
+5. Breast cancer organization 

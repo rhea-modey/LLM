@@ -118,7 +118,6 @@ def get_annotation_from_api(entry, persona):
     return response.choices[0].message.content.strip()
 
 
-
 # Initialize dictionary for annotations
 annotations = {entry: {"Emily": "", "Michael": ""} for entry in text_entries}
 
