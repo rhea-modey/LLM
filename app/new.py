@@ -36,6 +36,8 @@ ax.set_xlabel('Index')
 ax.set_ylabel("value")
 ax.legend()
 
+st.pyplot(fig)
+
 # Phase 1: Chatbot persona creation
 st.header("Phase 1: Chatbot Persona Creation")
 persona_selected = st.radio("Select Chatbot Persona", list(chatbot_personas.keys()))
@@ -95,14 +97,14 @@ codebook = {
     }
 }
 
-flattened_codebook = {
-    "NE": [
-        f"{key}. {value['label']}" for key, value in codebook["Narrative Event(s) related to breast cancer 'NE'"].items()
-    ],
-    "NP": [
-        f"{key}. {value['label']}" for key, value in codebook["Narrator perspective 'NP'"].items()
-    ]
-}
+# flattened_codebook = {
+#     "NE": [
+#         f"{key}. {value['label']}" for key, value in codebook["Narrative Event(s) related to breast cancer 'NE'"].items()
+#     ],
+#     "NP": [
+#         f"{key}. {value['label']}" for key, value in codebook["Narrator perspective 'NP'"].items()
+#     ]
+# }
 
 text_entries = data_sheet.loc[:2, "content"].to_numpy()
 #change this number to increas the number of text entries used
@@ -118,7 +120,6 @@ st.write(text_entries)
     # "Rest in peace to Jill Cohen, a powerful breast cancer advocate and friend, who passed away after 17 years of fighting breast cancer. Our hearts are with her family and friends.",
     # "I had a bilateral mastectomy and had decided I did not want a reconstruction. It took a lot of work to feel at peace with my decision. My breasts had fed both of my children and served me well, but now it was time to let them go. I feel proud to still be here and to have highlighted that beauty comes in different shapes and sizes. It is what is inside us that shines out. Today, I am enough. Boobless and all.'",
     # # Add more text entries as needed
-]
 
 # Function to ask OpenAI to annotate text based on persona
 @st.cache_data
@@ -155,7 +156,10 @@ def get_chatbot_discussion_and_update_codebook(text_entries, annotations, codebo
 
     prompt += (
         "Based on the differences in their annotations, they will discuss how to refine the codebook rules "
-        "to make them clearer and more specific. Provide a transcript of their discussion and propose updated rules for the codebook."
+        "to make them clearer and more specific. The codebook rules can still only contain 4 labels/categories "
+        "that have labels 1-4. There should not be any additional labels. Do not include updates to the narrator perpspective, "
+        "the updates should only be to the descriptions/refinement of narrative events."
+        " Provide a transcript of their discussion and propose updated rules for the codebook."
         "\n\nReturn only the updated rules as JSON."
     )
 
